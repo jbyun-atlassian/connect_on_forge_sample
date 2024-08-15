@@ -1,0 +1,260 @@
+modules:
+  jira:customField:
+    - key: cf-type-money
+      name: Development cost
+      description: Tracks the development cost of features, in different currencies
+      type: object
+      formatter:
+        expression: "`${value.amount} ${value.currency}`"
+      schema:
+        properties:
+          amount:
+            type: number
+            searchAlias: Amount
+          currency:
+            type: string
+            enum: ["USD", "EURO", "AUD"]
+            searchAlias: Currency
+          spender:
+            type: string
+            searchType: user
+            searchAlias: Spender
+        required: ["amount", "currency"]
+connectModules:
+  "jira:lifecycle": [{ "key": "connect-lifecycle", "installed": "/installed" }]
+  "jira:configurePage":
+    [
+      {
+        "url": "/jb-config-page?user_account={profileUser.accountId}",
+        "name": { "value": "JB Configure Page" },
+        "key": "jb-config-page",
+      },
+    ]
+  "jira:generalPages": [
+      {
+        "key": "hello-world",
+        "name": { "value": "Hello World (Harmo)" },
+        "url": "/hello-world?user_account={profileUser.accountId}",
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      # {
+      #     "key": "app-specific-context",
+      #     "url": "/onecloud-forever/{ac.action}?thingId={ac.thingId}",
+      #     "name": { "value": "JB h11n app-specific-context" },
+      #     "conditions": [ { "condition": "user_is_logged_in" } ]
+      #   },
+      {
+        "key": "license-page-jira",
+        "location": "system.top.navigation.bar",
+        "name": { "value": "License viewer" },
+        "url": "/license",
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      {
+        "key": "license-page-jira-only-for-advanced",
+        "location": "system.top.navigation.bar",
+        "name": { "value": "License viewer (only for advanced)" },
+        "url": "/license",
+        "conditions":
+          [
+            { "condition": "user_is_logged_in" },
+            {
+              "condition": "capability_set",
+              "params": { "value": "capabilityAdvanced" },
+            },
+          ],
+      },
+    ]
+  "confluence:generalPages": [
+      {
+        "key": "hello-world-confluence",
+        "name": { "value": "Hello World (Harmo)" },
+        "location": "system.header/left",
+        "url": "/hello-world?user_account={profileUser.accountId}",
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      {
+        "key": "license-page-confluence",
+        "location": "system.header/left",
+        "name": { "value": "License viewer" },
+        "url": "/license",
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      {
+        "key": "license-page-confluence-only-for-advanced",
+        "location": "system.header/left",
+        "name": { "value": "License viewer (only for advanced)" },
+        "url": "/license",
+        "conditions":
+          [
+            { "condition": "user_is_logged_in" },
+            {
+              "condition": "capability_set",
+              "params": { "value": "capabilityAdvanced" },
+            },
+          ],
+      },
+    ]
+  "jira:webPanels":
+    [
+      {
+        "key": "issue-context",
+        "location": "atl.jira.view.issue.right.context",
+        "url":
+          "/onecloud-forever?issue_key={issue.key}&issue_id={issue.id}&project_key\
+          ={project.key}&project_id={project.id}&issuetype_id={issuetype.id}",
+        "params": {},
+        "name": { "value": "JB h11n issue-context" },
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      {
+        "key": "condition-context",
+        "location": "atl.jira.view.issue.right.context",
+        "url":
+          "/onecloud-forever?conditionDummy={condition.dummy}&conditionIsAdminMode\
+          ={condition.is_admin_mode}&conditionUserLoggedIn={condition.user_is\
+          _logged_in}&conditionHasProjectPerms={condition.has_project_permiss\
+          ion(permission=BROWSE_PROJECTS)}",
+        "params": {},
+        "name": { "value": "JB h11n condition-context" },
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+      {
+        "key": "version-context",
+        "location": "atl.jira.releasereport.top.right.panels",
+        "url":
+          "/onecloud-forever/project-admin?version_id={version.id}&component_id={c\
+          omponent.id}",
+        "params": {},
+        "name": { "value": "JB h11n version-context" },
+        "conditions": [{ "condition": "user_is_logged_in" }],
+      },
+    ]
+  "jira:webSections":
+    [
+      {
+        "key": "project-admin-menu-section",
+        "location": "atl.jira.proj.config",
+        "name": { "value": "Project admin app" },
+      },
+    ]
+  "jira:jiraProjectAdminTabPanels":
+    [
+      {
+        "location": "project-admin-menu-section",
+        "url":
+          "/onecloud-forever/project-admin?version_id={version.id}&component_id={c\
+          omponent.id}",
+        "weight": 100,
+        "name": { "value": "JB h11n project admin context" },
+        "key": "project-admin-panel",
+      },
+    ]
+  "jira:jiraDashboardItems":
+    [
+      {
+        "description": { "value": "JB h11n dashboard item" },
+        "url":
+          "/dashboard-item-test?dashboardItemId={dashboardItem.id}&dashboardItemKe\
+          y={dashboardItem.key}&dashboardId={dashboard.id}&view={dashboardIte\
+          m.viewType}",
+        "configurable": true,
+        "thumbnailUrl": "atlassian-icon-16.png",
+        "refreshable": false,
+        "name": { "value": "JB h11n Dashboard item title" },
+        "key": "dashboard-item-key",
+      },
+    ]
+  "jira:webItems":
+    [
+      {
+        "location": "jira.issue.tools",
+        "weight": 200,
+        "styleClasses": ["webitem", "system-present-webitem"],
+        "url":
+          "/onecloud-forever/webitem?issue_key={issue.key}&issue_id={issue.id}&pro\
+          ject_key={project.key}&project_id={project.id}&issuetype_id={issuet\
+          ype.id}",
+        "context": "addon",
+        "target": { "type": "page" },
+        "tooltip": { "value": "Example tooltip" },
+        "icon": { "width": 16, "height": 16, "url": "/maps/icon.png" },
+        "name": { "value": "JB h11n Web Item" },
+        "key": "web-item-example",
+      },
+      {
+        "location": "jira.issue.tools",
+        "weight": 200,
+        "styleClasses": ["webitem", "system-present-webitem"],
+        "context": "addon",
+        "target":
+          { "type": "dialogmodule", "options": { "key": "dialog-jb-h11n" } },
+        "tooltip": { "value": "Example tooltip" },
+        "icon": { "width": 16, "height": 16, "url": "/maps/icon.png" },
+        "name": { "value": "JB h11n Web Item targeting dialog" },
+        "key": "web-item-targeting-dialog",
+      },
+    ]
+  "jira:dialogs":
+    [
+      {
+        "url":
+          "/onecloud-forever/dialog?issue_key={issue.key}&issue_id={issue.id}&proj\
+          ect_key={project.key}&project_id={project.id}&issuetype_id={issuety\
+          pe.id}",
+        "options":
+          { "size": "fullscreen", "header": { "value": "JB h11n Dialog" } },
+        "key": "dialog-jb-h11n",
+      },
+    ]
+  "jira:webhooks":
+    [
+      {
+        "event": "jira:issue_created",
+        "url":
+          "/onecloud-webhook?name=issue_created&product=jira&projectId=${project.i\
+          d}&projectKey=${project.key}&issueKey=${issue.key}&issueId=${issue.\
+          id}&version_id={version.id}&component_id={component.id}",
+        "excludeBody": false,
+        "key": "jb-webhook-issue-created",
+      },
+      {
+        "event": "jira:version_released",
+        "url":
+          "/onecloud-webhook?name=version_released&product=jira&projectId=${projec\
+          t.id}&projectKey=${project.key}&versionId=${version.id}",
+        "excludeBody": false,
+        "key": "jb-webhook-version-released",
+      },
+      {
+        "event": "jira:version_created",
+        "url":
+          "/onecloud-webhook?name=version_created&product=jira&versionId=${version\
+          .id}",
+        "excludeBody": false,
+        "key": "jb-webhook-version-created",
+      },
+    ]
+remotes:
+  - key: connect
+    baseUrl: https://8cbc-114-73-142-149.ngrok-free.app
+permissions:
+  scopes:
+    - storage:app
+    - write:jira-work
+    - write:project:jira
+    - write:connect-jira
+    - read:project:jira
+    - read:connect-jira
+    - read:jira-work
+    - read:app-data:confluence
+    - write:app-data:confluence
+    - act-as-user:connect-jira
+app:
+  # id: ari:cloud:ecosystem::app/618946b8-f6e3-48a1-a5fe-9690efa1fdf4
+  id: ari:cloud:ecosystem::app/661d9dc9-3edf-4e76-b57d-76d6c21b6056 # prod
+  connect:
+    key: my-app-jira-300724
+    remote: connect
+  runtime:
+    name: sandbox

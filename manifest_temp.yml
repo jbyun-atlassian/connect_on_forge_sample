@@ -1,0 +1,131 @@
+app:
+  id: ari:cloud:ecosystem::app/d92a2da9-2139-49ea-9b39-e08a54c4c932
+  connect:
+    key: my-app-jira
+    remote: connect
+    authentication: jwt
+  licensing:
+    enabled: true
+remotes:
+  - key: connect
+    baseUrl: https://9b02-114-73-142-149.ngrok-free.app
+connectModules:
+  jira:lifecycle:
+    - key: lifecycle-events
+      installed: /installed
+  jira:configurePage:
+    - url: /jb-config-page?user_account={profileUser.accountId}
+      name:
+        value: JB Configure Page
+      key: jb-config-page
+  jira:adminPages:
+    - url: /hello-world?user_account={profileUser.accountId}
+      location: admin_system_menu/top_system_section
+      name:
+        value: JB Connect Admin Page
+      key: my-admin-page
+  jira:generalPages:
+    - key: hello-world-page-jira
+      location: system.top.navigation.bar
+      name:
+        value: Hello World
+      url: /hello-world?user_account={profileUser.accountId}
+      conditions:
+        - condition: user_is_logged_in
+  jira:webPanels:
+    - key: issue-context
+      location: atl.jira.view.issue.right.context
+      url: >-
+        /onecloud-forever?issue_key={issue.key}&issue_id={issue.id}&project_key={project.key}&project_id={project.id}&issuetype_id={issuetype.id}&version_id={version.id}&component_id={component.id}
+      params: {}
+      name:
+        value: JB Connect issue-context
+      conditions:
+        - condition: user_is_logged_in
+    - key: version-context
+      location: atl.jira.releasereport.top.right.panels
+      url: >-
+        /onecloud-forever/project-admin?version_id={version.id}&component_id={component.id}
+      name:
+        value: JB h11n version-context
+  jira:webSections:
+    - key: project-admin-menu-section
+      location: atl.jira.proj.config
+      name:
+        value: Project admin app
+  jira:jiraProjectAdminTabPanels:
+    - location: project-admin-menu-section
+      url: /onecloud-forever/project-admin?accountId={profileUser.accountId}
+      weight: 100
+      name:
+        value: JB Connect project admin context
+      key: project-admin-panel
+  jira:webItems:
+    - location: jira.issue.tools
+      weight: 200
+      styleClasses:
+        - webitem
+        - system-present-webitem
+      url: >-
+        /onecloud-forever/webitem?issue_key={issue.key}&issue_id={issue.id}&project_key={project.key}&project_id={project.id}&issuetype_id={issuetype.id}
+      context: addon
+      target:
+        type: page
+      tooltip:
+        value: Example tooltip
+      icon:
+        width: 16
+        height: 16
+        url: /maps/icon.png
+      name:
+        value: JB Connect Web Item
+      key: web-item-example
+    - location: jira.issue.tools
+      weight: 200
+      styleClasses:
+        - webitem
+        - system-present-webitem
+      context: addon
+      target:
+        type: dialogmodule
+        options:
+          key: dialog-jb-h11n
+      tooltip:
+        value: Example tooltip
+      icon:
+        width: 16
+        height: 16
+        url: /maps/icon.png
+      name:
+        value: JB Connect Web Item targeting dialog
+      key: web-item-targeting-dialog
+  jira:dialogs:
+    - url: >-
+        /onecloud-forever/dialog?issue_key={issue.key}&issue_id={issue.id}&project_key={project.key}&project_id={project.id}&issuetype_id={issuetype.id}
+      options:
+        size: fullscreen
+        header:
+          value: JB Connect Dialog
+      key: dialog-jb-h11n
+  jira:webhooks:
+    - event: jira:issue_created
+      url: >-
+        /onecloud-webhook?name=issue_created&product=jira&projectId=${project.id}&projectKey=${project.key}&issueKey=${issue.key}&issueId=${issue.id}&version_id={version.id}&component_id={component.id}
+      excludeBody: false
+      key: webhook-1
+    - event: jira:version_released
+      url: >-
+        /onecloud-webhook?name=version_released&product=jira&projectId=${project.id}&projectKey=${project.key}&versionId=${version.id}
+      excludeBody: false
+      key: webhook-2
+    - event: jira:version_created
+      url: >-
+        /onecloud-webhook?name=version_created&product=jira&versionId=${version.id}
+      excludeBody: false
+      key: webhook-3
+permissions:
+  scopes:
+    - read:connect-jira
+    - write:connect-jira
+    - project-admin:connect-jira
+    - act-as-user:connect-jira

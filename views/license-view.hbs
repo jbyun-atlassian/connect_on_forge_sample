@@ -1,0 +1,32 @@
+{{!< layout}}
+<header class="aui-page-header">
+  <div class="aui-page-header-inner">
+    <div class="aui-page-header-main intro-header">
+      <h1>License Viewer</h1>
+    </div>
+  </div>
+</header>
+
+<div class="aui-page-panel main-panel">
+  <div class="aui-page-panel-inner">
+    <section class="aui-page-panel-item">
+      <div class="aui-group">
+        <div class="aui-item">
+          <p>
+            {{licenseData}}
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="aui-page-panel-inner">
+  <p>
+    {{#if isAdvanced}}
+      <h3>Thanks for choosing advanced version</h3>
+    {{else}}
+      <h3>This section is available only for Advanced license; please pay more</h3>
+    {{/if}}
+  </p>
+</div>
