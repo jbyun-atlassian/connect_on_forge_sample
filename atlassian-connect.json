@@ -9,7 +9,7 @@
   "lifecycle": {
     "installed": "/installed"
   },
-  "scopes": ["READ", "write", "PROJECT_ADMIN", "ACT_AS_USER"],
+  "scopes": ["READ", "write", "ACT_AS_USER"],
   "apiMigrations": {
     "signed-install": true
   },
@@ -136,17 +136,17 @@
         }
       }
     ],
-    "jiraProjectAdminTabPanels": [
-      {
-        "location": "project-admin-menu-section",
-        "url": "/onecloud-forever/project-admin?accountId={profileUser.accountId}",
-        "weight": 100,
-        "name": {
-          "value": "JB Connect project admin context"
-        },
-        "key": "project-admin-panel"
-      }
-    ],
+    // "jiraProjectAdminTabPanels": [
+    //   {
+    //     "location": "project-admin-menu-section",
+    //     "url": "/onecloud-forever/project-admin?accountId={profileUser.accountId}",
+    //     "weight": 100,
+    //     "name": {
+    //       "value": "JB Connect project admin context"
+    //     },
+    //     "key": "project-admin-panel"
+    //   }
+    // ],
     "webItems": [
       {
         "location": "jira.issue.tools",
