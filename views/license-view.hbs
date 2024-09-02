@@ -1,32 +1,101 @@
 {{!< layout}}
+<style>
+  table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+th {
+  text-align: right;
+}
+td {
+  text-align: center;
+}
+
+div {
+  padding: 10px;
+}
+</style>
 <header class="aui-page-header">
   <div class="aui-page-header-inner">
     <div class="aui-page-header-main intro-header">
-      <h1>License Viewer</h1>
+      <h2>App plan checker</h2>
     </div>
   </div>
 </header>
 
 <div class="aui-page-panel main-panel">
   <div class="aui-page-panel-inner">
-    <section class="aui-page-panel-item">
-      <div class="aui-group">
-        <div class="aui-item">
-          <p>
-            {{licenseData}}
-          </p>
-        </div>
-      </div>
-    </section>
+    {{#if errorExist}}
+      <h3>{{errorMessage}}</h3>
+    {{else}}
+      <table>
+        <tr>
+          <th>App plan from LicenseAPI</th>
+          <td id='licapi-capset-result'>{{capSetInLicenseAPI}}</td>
+        </tr>
+        <tr>
+          <th>App plan from IFrame QueryParam</th>
+          <td id='qp-capset-result'>{{capSetInQP}}</td>
+        </tr>
+        <tr>
+          <th>App plan from LifecycleHook</th>
+          <td id='lifecycle-capset-result'>{{capSetInLifecycleHook}}</td>
+        </tr>
+        <tr>
+          <th>App plan from javascript API (ACJS)</th>
+          <td id='acjs-capset-result'>N/A</td>
+        </tr>
+      </table>
+    {{/if}}
   </div>
 </div>
 
 <div class="aui-page-panel-inner">
   <p>
-    {{#if isAdvanced}}
-      <h3>Thanks for choosing advanced version</h3>
-    {{else}}
-      <h3>This section is available only for Advanced license; please pay more</h3>
-    {{/if}}
+    <h3 id='test-result'>
+      checking ...
+    </h3>
   </p>
 </div>
+
+<script>
+  AP.context.getContext(function(response){ 
+    console.log("AP.context.getContext() result", response); 
+    const license = response.license;
+    console.log("license status from AP.context.getContext()", license); 
+
+    if (license && license.capabilitySet) {
+      $("#acjs-capset-result")
+        .empty()
+        .text(license.capabilitySet);
+    }
+
+    setTimeout(function() {
+      console.log("testing result boom boom");
+      const licapi_capset = $("#licapi-capset-result").html();
+      const qp_capset = $("#qp-capset-result").html();
+      const lifecycle_capset = $("#lifecycle-capset-result").html();
+      const acjs_capset = $("#acjs-capset-result").html();
+      
+      const allEqual = arr => arr.every( v => v == arr[0] )
+      const testResult = allEqual([
+        licapi_capset, 
+        qp_capset, 
+        lifecycle_capset, 
+        acjs_capset]);
+
+      if (testResult) {
+        $("#test-result")
+                .empty()
+                .css("background-color", "#9ACD32")
+                .text("Test passed! (all the values from different sources are identical)");
+      } else {
+        $("#test-result")
+                .empty()
+                .css("background-color", "#FF6347")
+                .text("Test failed! (all the values from different sources are NOT identical)");
+      }
+    }, 2000);
+  });
+</script>

@@ -1,5 +1,5 @@
 {
-  "key": "my-app-jira-300724",
+  "key": "jb-sample-030924",
   "name": "My app",
   "description": "My very first app",
   "baseUrl": "{{localBaseUrl}}",
@@ -50,7 +50,7 @@
         "key": "license-page-jira",
         "location": "system.top.navigation.bar",
         "name": {
-          "value": "License viewer"
+          "value": "App plan checker"
         },
         "url": "/license",
         "conditions": [
@@ -62,13 +62,26 @@
       {
         "key": "license-page-jira-only-for-advanced",
         "location": "system.top.navigation.bar",
-        "name": { "value": "License viewer (only for advanced)" },
-        "url": "/license",
+        "name": { "value": "App plan checker (only for advanced)" },
+        "url": "/license?app_plan_from_condition=capabilityAdvanced",
         "conditions": [
           { "condition": "user_is_logged_in" },
           {
             "condition": "capability_set",
             "params": { "value": "capabilityAdvanced" }
+          }
+        ]
+      },
+      {
+        "key": "license-page-jira-only-for-standard",
+        "location": "system.top.navigation.bar",
+        "name": { "value": "App plan checker (only for standard)" },
+        "url": "/license?app_plan_from_condition=capabilityStandard",
+        "conditions": [
+          { "condition": "user_is_logged_in" },
+          {
+            "condition": "capability_set",
+            "params": { "value": "capabilityStandard" }
           }
         ]
       },
@@ -82,20 +95,33 @@
       {
         "key": "license-page-confluence",
         "location": "system.header/left",
-        "name": { "value": "License viewer" },
+        "name": { "value": "App plan checker" },
         "url": "/license",
         "conditions": [{ "condition": "user_is_logged_in" }]
       },
       {
         "key": "license-page-confluence-only-for-advanced",
         "location": "system.header/left",
-        "name": { "value": "License viewer (only for advanced)" },
-        "url": "/license",
+        "name": { "value": "App plan checker (only for advanced)" },
+        "url": "/license?app_plan_from_condition=capabilityAdvanced",
         "conditions": [
           { "condition": "user_is_logged_in" },
           {
             "condition": "capability_set",
             "params": { "value": "capabilityAdvanced" }
+          }
+        ]
+      },
+      {
+        "key": "license-page-confluence-only-for-standard",
+        "location": "system.header/left",
+        "name": { "value": "App plan checker (only for standard)" },
+        "url": "/license?app_plan_from_condition=capabilityStandard",
+        "conditions": [
+          { "condition": "user_is_logged_in" },
+          {
+            "condition": "capability_set",
+            "params": { "value": "capabilityStandard" }
           }
         ]
       }

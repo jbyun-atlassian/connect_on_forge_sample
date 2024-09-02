@@ -1,3 +1,4 @@
+
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,
   // which will be served by atlassian-connect-express.
@@ -20,51 +21,78 @@ export default function routes(app, addon) {
     );
   });
 
-  app.get("/license", addon.authenticate(), (req, res) => {
-    var httpClient = addon.httpClient(req);
-    console.log("url: " + "/rest/atlassian-connect/1/addons/" + addon.key);
-    console.log("lic: " + req.query.lic);
-
-    const capabilitySet = req.query.capSet;
-    console.log("capabilitySet: " + capabilitySet);
-    const isAdvanced = capabilitySet === "capabilityAdvanced";
-    console.log("isAdvanced: " + isAdvanced);
-
-    httpClient.get(
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+  function get(httpClient, url) {
+    return new Promise(function (resolve, reject) {
+      httpClient.get(
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          url,
         },
-        url: "/rest/atlassian-connect/1/addons/" + addon.key,
-      },
-      function (err, response, body) {
-        if (err) {
-          // console.log(response.statusCode + ": " + err);
-          // res.send("Error: " + response.statusCode + ": " + err);
-          res.render(
-            'license-view.hbs', // change this to 'hello-world.jsx' to use the Atlaskit & React version
-            {
-              licenseData: "Error: " + response.statusCode + ": " + JSON.stringify(err)
-              //, issueId: req.query['issueId']
-              //, browserOnly: true // you can set this to disable server-side rendering for react views
-            }
-          );
-        } else {
-          // console.log(response.statusCode, body);
-          // res.send(body);
-          res.render(
-            'license-view.hbs', // change this to 'hello-world.jsx' to use the Atlaskit & React version
-            {
-              licenseData: body,
-              isAdvanced,
-              //, issueId: req.query['issueId']
-              //, browserOnly: true // you can set this to disable server-side rendering for react views
-            }
-          );
+        function (err, response, body) {
+          if (err) {
+            reject({
+              statusCode: response.statusCode,
+              message: err,
+            });
+          } else {
+            resolve(body);
+          }
         }
-      }
-    );
+      );
+    });
+  }
+
+  app.get("/license", addon.authenticate(), async (req, res) => {
+    var httpClient = addon.httpClient(req);
+
+    try {
+      console.log("req.context.clientKey", req.context.clientKey);
+      console.log("req.context.hostBaseUrl:", req.context.hostBaseUrl);
+      console.log("req.context.userAccountId:", req.context.userAccountId);
+
+      // License API
+      const licenseApi = "/rest/atlassian-connect/1/addons/";
+      const licApiResponse = await get(httpClient, `${licenseApi}${addon.key}`);
+      console.log('license API Response, ', licApiResponse);
+      const parsedLicApiRes = JSON.parse(licApiResponse);
+
+      // Query Parameter
+      const capabilitySet = req.query.capSet;
+      const isAdvanced = capabilitySet === "capabilityAdvanced";
+
+      // Lifecycle hook
+      const clientSettings = await addon.settings.get(
+        "clientInfo",
+        req.context.clientKey
+      );
+
+      //results
+      const capSetInLicenseAPI =
+        parsedLicApiRes.license && parsedLicApiRes.license.capabilitySet
+          ? parsedLicApiRes.license.capabilitySet
+          : "N/A";
+      const capSetInQP = req.query.capSet ? req.query.capSet : "N/A";
+      const capSetInLifecycleHook = clientSettings.capabilitySet
+        ? clientSettings.capabilitySet
+        : "N/A";
+
+      res.render("license-view.hbs", {
+        capSetInLicenseAPI,
+        capSetInQP,
+        capSetInLifecycleHook,
+        isAdvanced,
+        errorExist: false,
+      });
+    } catch (ex) {
+      console.log(ex);
+      res.render("license-view.hbs", {
+        errorExist: true,
+        errorMessage: ex,
+      });
+    }
   });
 
   // Add additional route handlers here...
